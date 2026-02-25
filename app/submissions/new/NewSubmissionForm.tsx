@@ -17,7 +17,7 @@ export default function NewSubmissionForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [properties, setProperties] = useState<PropertyRow[]>([
-    { address1: '', city: '', state: 'TX', zip: '', occupancyType: 'LRO', units: 1 }
+    { address1: '123 Main St', city: 'Houston', state: 'TX', zip: '77002', occupancyType: 'LRO', units: 1 }
   ]);
 
   function updateProp(index: number, patch: Partial<PropertyRow>) {
@@ -27,7 +27,7 @@ export default function NewSubmissionForm() {
   }
 
   function addProperty() {
-    setProperties([...properties, { address1: '', city: '', state: 'TX', zip: '', occupancyType: 'LRO', units: 1 }]);
+    setProperties([...properties, { address1: '456 Oak Ave', city: 'Dallas', state: 'TX', zip: '75201', occupancyType: 'LRO', units: 1 }]);
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -89,15 +89,15 @@ export default function NewSubmissionForm() {
         </div>
         <div>
           <label className="block text-sm mb-1">Name</label>
-          <input name="accountName" className="input" required />
+          <input name="accountName" className="input" defaultValue="Lone Star Property Holdings LLC" required />
         </div>
-        <div><label className="block text-sm mb-1">Contact Name</label><input name="contactName" className="input" /></div>
-        <div><label className="block text-sm mb-1">Phone</label><input name="phone" className="input" /></div>
-        <div><label className="block text-sm mb-1">Email</label><input name="email" className="input" type="email" /></div>
-        <div><label className="block text-sm mb-1">Mailing Address</label><input name="mailingAddress1" className="input" required /></div>
-        <div><label className="block text-sm mb-1">Address 2</label><input name="mailingAddress2" className="input" /></div>
-        <div><label className="block text-sm mb-1">City</label><input name="mailingCity" className="input" required /></div>
-        <div><label className="block text-sm mb-1">ZIP</label><input name="mailingZip" className="input" pattern="\d{5}" required /></div>
+        <div><label className="block text-sm mb-1">Contact Name</label><input name="contactName" className="input" defaultValue="Alex Rivera" /></div>
+        <div><label className="block text-sm mb-1">Phone</label><input name="phone" className="input" defaultValue="713-555-0199" /></div>
+        <div><label className="block text-sm mb-1">Email</label><input name="email" className="input" type="email" defaultValue="quotes@lonestarholdings.com" /></div>
+        <div><label className="block text-sm mb-1">Mailing Address</label><input name="mailingAddress1" className="input" defaultValue="1000 Congress Ave" required /></div>
+        <div><label className="block text-sm mb-1">Address 2</label><input name="mailingAddress2" className="input" defaultValue="Suite 250" /></div>
+        <div><label className="block text-sm mb-1">City</label><input name="mailingCity" className="input" defaultValue="Austin" required /></div>
+        <div><label className="block text-sm mb-1">ZIP</label><input name="mailingZip" className="input" pattern="\d{5}" defaultValue="78701" required /></div>
       </div>
 
       <h2 className="font-semibold mt-4">Submission</h2>
@@ -119,7 +119,7 @@ export default function NewSubmissionForm() {
         </div>
         <div>
           <label className="block text-sm mb-1">Effective Date</label>
-          <input name="effectiveDate" className="input" type="date" />
+          <input name="effectiveDate" className="input" type="date" defaultValue={new Date().toISOString().slice(0, 10)} />
         </div>
       </div>
 
