@@ -35,6 +35,20 @@ A runnable end-to-end MVP quote + issue system for **Texas-only** real estate um
 - `POST /api/submissions/:id/quote`
 - `POST /api/submissions/:id/issue`
 - `GET /api/policies/:id/pdf`
+- `POST /api/rate` (simple external rating API)
+
+### `/api/rate` request
+Requires header: `x-api-key: <RATE_API_KEY>`
+
+```json
+{
+  "coverageAmount": 1000000,
+  "locationCount": 3
+}
+```
+
+Response premium uses:
+`(coverageAmount / 1000) * 2.3 * locationCount`
 
 ## Data Model
 
@@ -99,6 +113,7 @@ Set your Postgres connection in `.env`:
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/tx_umbrella_mvp?schema=public"
 SEED_ADMIN_PASSWORD="ChangeMe123!"
 SEED_AGENT_PASSWORD="ChangeMe123!"
+RATE_API_KEY="replace-with-strong-api-key"
 ```
 
 ### 3) Initialize database schema and generate Prisma client
