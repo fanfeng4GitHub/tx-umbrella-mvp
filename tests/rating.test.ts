@@ -13,11 +13,10 @@ describe('rateTexasUmbrella', () => {
     expect(result.eligible).toBe(true);
     expect(result.refer).toBe(false);
 
-    const expectedBase = Number((TX_RATING_CONFIG.TX_BASE_RATE * 1.0 * 1.15).toFixed(2));
-    const expectedTF = Number((expectedBase * TX_RATING_CONFIG.TX_TAX_RATE + TX_RATING_CONFIG.TX_FLAT_FEE).toFixed(2));
+    const expectedBase = Number(((1_000_000 / 1000) * TX_RATING_CONFIG.PER_THOUSAND_RATE * 2).toFixed(2));
     expect(result.basePremium).toBe(expectedBase);
-    expect(result.taxesAndFees).toBe(expectedTF);
-    expect(result.totalPremium).toBe(Number((expectedBase + expectedTF).toFixed(2)));
+    expect(result.taxesAndFees).toBe(0);
+    expect(result.totalPremium).toBe(expectedBase);
   });
 
   it('blocks if underlying below minimum', () => {
