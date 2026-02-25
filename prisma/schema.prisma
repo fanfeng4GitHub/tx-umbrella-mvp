@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  AGENT
+  ADMIN
+}
+
+enum AccountType {
+  PERSON
+  ENTITY
+}
+
+enum SubmissionStatus {
+  DRAFT
+  QUOTED
+  ISSUED
+}
+
+enum OccupancyType {
+  LRO
+  STR
+  VACANT
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  passwordHash  String
+  role          Role
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  submissions   Submission[]
+  policies      Policy[]
+  auditEvents   AuditEvent[]
+}
+
+model Session {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  userId      String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id               String      @id @default(uuid())
+  type             AccountType
+  name             String
+  contactName      String?
+  phone            String?
+  email            String?
+  mailingAddress1  String
+  mailingAddress2  String?
+  city             String
+  state            String
+  zip              String
+  createdByUserId  String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  createdBy        User        @relation(fields: [createdByUserId], references: [id])
+  submissions      Submission[]
+  policies         Policy[]
+}
+
+model Submission {
+  id                         String           @id @default(uuid())
+  accountId                  String
+  status                     SubmissionStatus @default(DRAFT)
+  effectiveDate              DateTime?
+  stateOfRisk                String           @default("TX")
+  underlyingLiabilityLimit   Int
+  umbrellaLimit              Int
+  totalProperties            Int              @default(0)
+  createdByUserId            String
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
+
+  account                    Account          @relation(fields: [accountId], references: [id])
+  createdBy                  User             @relation(fields: [createdByUserId], references: [id])
+  properties                 Property[]
+  quotes                     Quote[]
+  policy                     Policy?
+}
+
+model Property {
+  id              String        @id @default(uuid())
+  submissionId    String
+  address1        String
+  address2        String?
+  city            String
+  state           String
+  zip             String
+  occupancyType   OccupancyType @default(LRO)
+  units           Int           @default(1)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  submission      Submission    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
+
+model Quote {
+  id                 String    @id @default(uuid())
+  submissionId       String
+  version            Int
+  basePremium        Decimal
+  taxesAndFees       Decimal
+  totalPremium       Decimal
+  ratingInputsJson   Json
+  ratingOutputsJson  Json
+  createdAt          DateTime  @default(now())
+
+  submission         Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, version])
+}
+
+model Policy {
+  id                          String   @id @default(uuid())
+  policyNumber                String   @unique
+  submissionId                String   @unique
+  accountId                   String
+  issuedAt                    DateTime
+  effectiveDate               DateTime
+  expirationDate              DateTime
+  umbrellaLimit               Int
+  underlyingLiabilityLimit    Int
+  totalPremium                Decimal
+  decPdfPathOrBlobRef         String
+  createdByUserId             String
+
+  submission                  Submission @relation(fields: [submissionId], references: [id])
+  account                     Account    @relation(fields: [accountId], references: [id])
+  createdBy                   User       @relation(fields: [createdByUserId], references: [id])
+}
+
+model AuditEvent {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String
+  entityType  String
+  entityId    String
+  detailsJson Json?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id])
+}
+
+model PolicySequence {
+  id         String   @id @default(uuid())
+  state      String
+  year       Int
+  lastNumber Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([state, year], name: "state_year")
+}

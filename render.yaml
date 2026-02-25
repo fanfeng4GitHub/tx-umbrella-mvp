@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: tx-umbrella-mvp
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma generate && npx prisma db push && npm run build
+    startCommand: npm run prisma:seed && npm start
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        value: ChangeMe123!
+      - key: SEED_AGENT_PASSWORD
+        value: ChangeMe123!
